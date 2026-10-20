@@ -2442,8 +2442,12 @@ class RecordedTask:
         return [
             self.line,
             *self.description_lines,
-            *(line for child in self.children for line in child.lines),
-        ]
+            *(
+                line
+                for child in self.children
+                for line in child.lines
+            ),
+        ]  # fmt: skip
 
     @property
     def line(self) -> str:
