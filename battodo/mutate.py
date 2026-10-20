@@ -1429,11 +1429,15 @@ class Completion:
         """
         self.task.node.refuse_attributes(self.attrs)
         kind = SCRATCHED_EVENT if self.scratched else COMPLETED_EVENT
-        events = []
-        for completion in self.completions:
-            stream = self.lines.ids[completion.ancestry.stream.raw_index]
-            payload = completion.payload
-            events.append(Event(kind, f'task/{stream}', payload))
+        completions, ids = self.completions, self.lines.ids
+        streams = [
+            f'task/{ids[completion.ancestry.stream.raw_index]}'
+            for completion in completions
+        ]
+        events = [
+            Event(kind, stream, completion.payload)
+            for completion, stream in zip(completions, streams)
+        ]
         return [*self.assignments, *events]
 
     @property
