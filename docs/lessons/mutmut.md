@@ -67,6 +67,8 @@ upstream issue candidates against boxed/mutmut.
   survivor, keep the caught line in a plain method. In #123,
   `Journal.next_seq` is a `@property`, so `len(self.events) + 1` has no
   mutant, and only its unit test pins it.
+  2026-10-19: the decorated-class skip is resolved by mutmut 3.8.0
+  (PR #133). The decorated-function skip remains (#387).
 - **A cleared environment hides the active mutant:** the trampoline
   reads `MUTANT_UNDER_TEST` from `os.environ` on every call. A test
   under `patch.dict(os.environ, ..., clear=True)` removes it. The stats
@@ -82,3 +84,4 @@ upstream issue candidates against boxed/mutmut.
   look for the class in `tests_by_mangled_function_name` of
   `mutants/mutmut-stats.json`. Upstream candidate: the docs do not say
   that the variable must survive the environment of a test.
+  Resolved by mutmut 3.8.0 (PR #133).
