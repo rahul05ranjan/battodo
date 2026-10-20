@@ -1251,19 +1251,18 @@ class Reopen:
         its attributes.
         """
         named, list_left = self.node.raw_index, self.list_left
-        events = []
-        for task in self.opened:
-            path = Ancestry(self.chains[task.raw_index])
-            changed = task.raw_index == named
-            opened = OpenedTask(
+        opened, chains = self.opened, self.chains
+        paths = [Ancestry(chains[task.raw_index]) for task in opened]
+        return [
+            OpenedTask(
                 path,
                 self.ids[task.raw_index],
                 list_left,
-                self.delta if changed else None,
-                self.attrs if changed else None,
-            )
-            events.append(opened.event)
-        return events
+                self.delta if task.raw_index == named else None,
+                self.attrs if task.raw_index == named else None,
+            ).event
+            for task, path in zip(opened, paths)
+        ]
 
     @property
     def delta(self) -> dict[str, list[Any]]:
