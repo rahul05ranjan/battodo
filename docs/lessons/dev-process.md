@@ -357,3 +357,14 @@
   after that time with the cooldown unchanged. Wait for the cooldown;
   never pin around it. The cooldown's first record is the win in
   [batconf.md](batconf.md).
+
+## Cutover record
+
+- 2026-10-19: the cutover of former ADR group 0013 is complete, and its
+  requirements file is retired. The live lists carry no `[BUMPED:]`,
+  the parked lists carry the parked marker, SCHEMA.md describes btodo,
+  the SessionStart hook runs `btodo view`, and no legacy script remains.
+  Backfill and the switchover ran as one step, because the legacy bump
+  pushes a stored `P` past 5 and btodo folds `P > 5` on the legacy scale
+  (ADR 0005): one legacy run turns `P:5` into `P:6`, and the multiplier
+  drops from 5 to 1.24.
