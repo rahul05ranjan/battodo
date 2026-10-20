@@ -239,22 +239,7 @@ class SuppliedDescription:
         if not self.text:
             return []
         lines = self.text.split('\n')
-        for line in lines:
-            stripped = line.strip()
-            if not stripped:
-                refusal = 'is blank'
-            elif CHECKBOX_RE.match(stripped):
-                refusal = 'reads as a task line'
-            elif stripped.startswith('## '):
-                refusal = 'reads as a heading'
-            elif stripped.startswith('<!--'):
-                refusal = 'reads as a comment'
-            elif '\r' in line:
-                refusal = 'holds a carriage return'
-            else:
-                continue
-            raise ValueError(f'description line {line!r} {refusal}')
-        return [line.strip() for line in lines]
+        return [DescriptionLine(line).checked for line in lines]
 
 
 class DescriptionLine:
@@ -272,7 +257,10 @@ class DescriptionLine:
         ValueError
             The line has a refusal.
         """
-        raise NotImplementedError
+        refusal = self.refusal
+        if refusal is not None:
+            raise ValueError(f'description line {self.text!r} {refusal}')
+        return self.text.strip()
 
     @property
     def refusal(self) -> str | None:
@@ -281,7 +269,18 @@ class DescriptionLine:
         A blank line, a task line, a heading or a comment, checked in
         that order, then a carriage return. None for a description line.
         """
-        raise NotImplementedError
+        stripped = self.text.strip()
+        if not stripped:
+            return 'is blank'
+        if CHECKBOX_RE.match(stripped):
+            return 'reads as a task line'
+        if stripped.startswith('## '):
+            return 'reads as a heading'
+        if stripped.startswith('<!--'):
+            return 'reads as a comment'
+        if '\r' in self.text:
+            return 'holds a carriage return'
+        return None
 
 
 class SuppliedFields:
