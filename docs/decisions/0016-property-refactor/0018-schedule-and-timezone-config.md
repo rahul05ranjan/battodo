@@ -98,3 +98,7 @@ be exempt from.
   cannot be nested tables. Both are recorded in [PLAN.md](PLAN.md).
 - The configuration surface grows by three fields, all of which must be
   documented where the existing view settings are documented.
+
+## Amendment — 2026-10-19
+
+Implemented in PR #137.
