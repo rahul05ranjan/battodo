@@ -35,6 +35,7 @@ import re
 from collections.abc import Mapping, Sequence
 from datetime import date, tzinfo
 from functools import cached_property
+from itertools import pairwise
 from json import dumps
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -2343,16 +2344,19 @@ class CompletionLines:
         so it finishes no ancestor either.
         """
         ancestry = self.ancestry
-        found = [Ancestry(ancestry)]
         if self.scratched:
-            return found
-        for depth in reversed(range(len(ancestry) - 1)):
-            parent, child = ancestry[depth], ancestry[depth + 1]
-            finished = all(c.done or c is child for c in parent.children)
-            if child.repeat or not finished:
-                break
-            found.append(Ancestry(ancestry[: depth + 1]))
-        return found
+            return [Ancestry(ancestry)]
+        stops = [
+            depth
+            for depth, (parent, child) in enumerate(pairwise(ancestry))
+                if child.repeat
+                or not all(c.done or c is child for c in parent.children)
+        ]  # fmt: skip
+        still_open = max(stops, default=-1) + 1
+        return [
+            Ancestry(ancestry[:size])
+            for size in range(len(ancestry), still_open, -1)
+        ]
 
 
 class TaskCompletion:
