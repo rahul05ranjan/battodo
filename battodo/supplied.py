@@ -448,14 +448,7 @@ class SuppliedAttributes:
         ValueError
             A segment holds no `=`.
         """
-        pairs = []
-        for segment in self.segments:
-            key, sign, value = segment.partition('=')
-            if not sign:
-                raise ValueError(
-                    f'attribute must read key=value, not {segment!r}'
-                )
-            pairs.append((key, value))
+        pairs = [AttributeSegment(segment).pair for segment in self.segments]
         if self.note is not None:
             pairs.append((NOTE_KEY, self.note))
         return pairs
@@ -514,4 +507,9 @@ class AttributeSegment:
         ValueError
             The segment holds no `=`.
         """
-        raise NotImplementedError
+        key, sign, value = self.text.partition('=')
+        if not sign:
+            raise ValueError(
+                f'attribute must read key=value, not {self.text!r}'
+            )
+        return key, value
