@@ -1863,12 +1863,16 @@ class ReopenTests(TestCase):
         parent = parent_node()
         child = child_node()
         grandchild = grandchild_node()
-        child.children = [grandchild]
-        parent.children = [child]
         bare = bare_node()
         bare.raw_index = 6
-        restored.return_value = Mock(spec=['tasks'])
-        restored.return_value.tasks = [parent, bare]
+        # Every task of the list with its ancestry, in file order.
+        restored.return_value = Mock(spec=['ancestries'])
+        restored.return_value.ancestries = [
+            [parent],
+            [parent, child],
+            [parent, child, grandchild],
+            [bare],
+        ]
 
         ret = t.ro.chains
 
