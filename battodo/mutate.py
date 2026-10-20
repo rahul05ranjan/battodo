@@ -2698,13 +2698,14 @@ class ListBackfill:
         so: a replay must not read it as an observed fact.
         """
         delta = {'ADDED': [None, self.today.isoformat()]}
-        events = []
-        for task in self.tasks:
-            payload = {
-                'delta': delta,
-                'snapshot': task.listed_snapshot(self.path.stem),
-                'backfilled': True,
-            }
-            stream = f'task/{self.ids[task.raw_index]}'
-            events.append(Event(ADDED_EVENT, stream, payload))
-        return events
+        tasks, list_name = self.tasks, self.path.stem
+        snapshots = [task.listed_snapshot(list_name) for task in tasks]
+        streams = [f'task/{self.ids[task.raw_index]}' for task in tasks]
+        return [
+            Event(
+                ADDED_EVENT,
+                stream,
+                {'delta': delta, 'snapshot': snapshot, 'backfilled': True},
+            )
+            for stream, snapshot in zip(streams, snapshots)
+        ]
